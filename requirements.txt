@@ -1,0 +1,9 @@
+# Core dependencies
+# Add your project dependencies here
+pypandoc>=1.15
+
+# Development dependencies (uncomment as needed)
+pytest>=8.4.0
+# black>=22.0.0
+# flake8>=5.0.0
+# mypy>=1.0.0
