@@ -21,9 +21,9 @@ if %errorlevel% neq 0 (
 )
 
 REM Check if pandoc.exe exists
-if not exist "tools\pandoc.exe" (
-    echo Error: pandoc.exe not found in tools directory!
-    echo Please run this script after downloading pandoc.
+if not exist "tools\pandoc-3.5\pandoc.exe" (
+    echo Error: pandoc.exe not found in tools\pandoc-3.5\ directory!
+    echo Please ensure pandoc is properly installed in the tools folder.
     pause
     exit /b 1
 )
