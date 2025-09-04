@@ -78,3 +78,4 @@ Thumbs.db
 ~$*
 tools/pandoc.exe
 tools/pandoc.zip
+tools/pandoc-*/pandoc.exe
