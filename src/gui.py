@@ -77,15 +77,20 @@ class OmvandlareGUI:
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
         
+        # Paste from clipboard button
+        self.paste_button = ttk.Button(button_frame, text="📋 Klistra in", 
+                                     command=self.paste_from_clipboard, width=15)
+        self.paste_button.grid(row=0, column=0, padx=(0, 10))
+        
         # Export button (only DOCX)
         self.docx_button = ttk.Button(button_frame, text="📝 Exportera till Word", 
                                     command=self.export_to_docx, width=25)
-        self.docx_button.grid(row=0, column=0, padx=(0, 15))
+        self.docx_button.grid(row=0, column=1, padx=(10, 10))
         
         # Clear button
         self.clear_button = ttk.Button(button_frame, text="🗑️ Rensa text", 
                                      command=self.clear_text, width=15)
-        self.clear_button.grid(row=0, column=1, padx=(15, 0))
+        self.clear_button.grid(row=0, column=2, padx=(10, 0))
         
         # Status bar
         self.status_var = tk.StringVar()
@@ -233,6 +238,59 @@ class OmvandlareGUI:
         except Exception as e:
             self.status_var.set("Export misslyckades!")
             messagebox.showerror("Exportfel", f"Misslyckades med att exportera till Word:\n\n{str(e)}\n\nSe till att du har de nödvändiga beroendena installerade.")
+    
+    def paste_from_clipboard(self):
+        """Paste text from clipboard into the text area."""
+        try:
+            # Get clipboard content
+            clipboard_content = self.root.clipboard_get()
+            
+            if not clipboard_content or not clipboard_content.strip():
+                messagebox.showinfo("Tomt innehåll", "Inget text hittades i urklipp!")
+                return
+            
+            # Check if text area already has content
+            current_content = self.get_text_content()
+            if current_content:
+                # Ask user what to do
+                result = messagebox.askyesnocancel(
+                    "Text finns redan", 
+                    "Textområdet innehåller redan text.\n\n"
+                    "• JA = Lägg till urklipp i slutet\n"
+                    "• NEJ = Ersätt all text med urklipp\n"
+                    "• Avbryt = Gör inget"
+                )
+                
+                if result is None:  # User clicked Cancel
+                    return
+                elif result is True:  # User clicked Yes (append)
+                    # Add clipboard content at the end
+                    self.text_area.insert(tk.END, "\n\n" + clipboard_content)
+                    self.status_var.set("Text från urklipp tillagd i slutet!")
+                else:  # User clicked No (replace)
+                    # Replace all content
+                    self.text_area.delete("1.0", tk.END)
+                    self.text_area.insert("1.0", clipboard_content)
+                    self.status_var.set("Text från urklipp inklistrad - ersatte tidigare innehåll!")
+            else:
+                # Text area is empty, just paste
+                self.text_area.insert("1.0", clipboard_content)
+                self.status_var.set("Text från urklipp inklistrad!")
+            
+            # Scroll to the beginning to show the content
+            self.text_area.see("1.0")
+            
+        except tk.TclError:
+            # Clipboard is empty or contains non-text data
+            messagebox.showwarning(
+                "Kunde inte klistra in", 
+                "Inget text hittades i urklipp eller urklipp innehåller data som inte är text."
+            )
+        except Exception as e:
+            messagebox.showerror(
+                "Fel vid inklistring", 
+                f"Ett oväntat fel uppstod när text skulle klistras in:\n\n{str(e)}"
+            )
     
     def clear_text(self):
         """Clear all text from the text area."""
